@@ -418,7 +418,7 @@ assertFloatList([m[0] for m in ms], 10)
 
 reviewsPerUser = defaultdict(list)
 reviewsPerItem = defaultdict(list)
-ratingMean = sum([d['star_rating'] for d in dataset]) / len(dataset)
+ratingMean = sum([d['star_rating'] for d in dataTrain]) / len(dataTrain)
 labels = [d['star_rating'] for d in dataset]
 ratingDict = {}
 itemNames = {}
@@ -427,9 +427,12 @@ itemAverages = {}
 
 for d in dataset:
     user,item = d['customer_id'], d['product_id']
+    ratingDict[(user,item)] = d['star_rating']
+
+for d in dataTrain:
+    user,item = d['customer_id'], d['product_id']
     usersPerItem[item].add(user)
     itemsPerUser[user].add(item)
-    ratingDict[(user,item)] = d['star_rating']
     itemNames[item] = d['product_title']
     reviewsPerUser[user].append(d)
     reviewsPerItem[item].append(d)
@@ -444,6 +447,12 @@ for i in usersPerItem:
 
 
 # In[49]:
+
+
+len(reviewsPerUser)
+
+
+# In[50]:
 
 
 def predictRating3(user,item):
@@ -461,61 +470,37 @@ def predictRating3(user,item):
         return ratingMean
 
 
-# In[50]:
-
-
-simPredictions = [predictRating3(d['customer_id'], d['product_id']) for d in tqdm(dataset)]
-
-
 # In[51]:
 
 
-answers['Q6'] = mean_squared_error(simPredictions, labels)
+simPredictions = [predictRating3(d['customer_id'], d['product_id']) for d in tqdm(dataTest)]
 
 
 # In[52]:
 
 
-assertFloat(answers['Q6'])
+answers['Q6'] = mean_squared_error(simPredictions, labels[int(len(dataset)*0.9):])
 
 
 # In[53]:
 
 
-### Question 7
+answers
 
 
 # In[54]:
 
 
-reviewsPerUser = defaultdict(list)
-reviewsPerItem = defaultdict(list)
-ratingMean = sum([d['star_rating'] for d in dataset]) / len(dataset)
-labels = [d['star_rating'] for d in dataset]
-ratingDict = {}
-itemNames = {}
-userAverages = {}
-itemAverages = {}
-
-for d in dataset:
-    user,item = d['customer_id'], d['product_id']
-    usersPerItem[item].add(user)
-    itemsPerUser[user].add(item)
-    ratingDict[(user,item)] = d['star_rating']
-    itemNames[item] = d['product_title']
-    reviewsPerUser[user].append(d)
-    reviewsPerItem[item].append(d)
-
-for u in itemsPerUser:
-    rs = [ratingDict[(u,i)] for i in itemsPerUser[u]]
-    userAverages[u] = sum(rs) / len(rs)
-    
-for i in usersPerItem:
-    rs = [ratingDict[(u,i)] for u in usersPerItem[i]]
-    itemAverages[i] = sum(rs) / len(rs)
+assertFloat(answers['Q6'])
 
 
 # In[55]:
+
+
+### Question 7
+
+
+# In[56]:
 
 
 # Generating score from timestamps
@@ -534,7 +519,7 @@ for d in dataset:
     timestamp_avgs[user][item] = generateScoreFromTimeStamp(d['review_date'])
 
 
-# In[56]:
+# In[57]:
 
 
 def predictRatingDecay(user,item):
@@ -554,21 +539,14 @@ def predictRatingDecay(user,item):
         return ratingMean
 
 
-# In[57]:
+# In[64]:
 
 
-simPredictionsDecay = [predictRatingDecay(d['customer_id'], d['product_id']) for d in tqdm(dataset)]
-new_mse = mean_squared_error(simPredictionsDecay, labels)
+simPredictionsDecay = [predictRatingDecay(d['customer_id'], d['product_id']) for d in tqdm(dataTest)]
+new_mse = mean_squared_error(simPredictionsDecay, labels[int(len(dataset)*0.9):])
 
 
-# In[58]:
-
-
-print("Old MSE: ", answers['Q6'])
-print("New MSE: ", new_mse)
-
-
-# In[59]:
+# In[65]:
 
 
 msg = '''
@@ -577,19 +555,19 @@ msg = '''
 '''
 
 
-# In[60]:
+# In[66]:
 
 
 answers['Q7'] = [msg, new_mse]
 
 
-# In[61]:
+# In[67]:
 
 
 assertFloat(answers['Q7'][1])
 
 
-# In[62]:
+# In[68]:
 
 
 f = open("answers_hw2.txt", 'w')
