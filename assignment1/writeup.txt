@@ -1,0 +1,12 @@
+Played Prediction (lines 1-115)
+- Standard solution from HW3
+- Tuned Hyperparamters
+- Calculated topics from review text for users and games
+- Calculated jaccard score between the topics
+- Used Jaccard in final assesment
+
+Hours Prediction (lines 116-231)
+- Calculate using formula
+- Obtain best betas and alphas
+- obtain preds via betas and alphas
+- tuned Hyperparamters
